@@ -61,10 +61,10 @@ model Produto {
   quantidade      Float         // Quantidade na embalagem
   unidade_medida  String
   preco_unitario  Float
-  qtd_estoque     Float
+  qtq_estoque     Float
   categoria_id    String        @db.ObjectId
   categoria       Categoria     @relation(fields: [categoria_id], references: [id])
-  fornecedor_id   String        @db.ObjectId
+  fornecedor_id   String?        @db.ObjectId
   fornecedor      Fornecedor    @relation(fields: [fornecedor_id], references: [id])
   itens_venda     ItemVenda[]
 }
