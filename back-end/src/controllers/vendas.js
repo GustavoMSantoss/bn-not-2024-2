@@ -8,7 +8,6 @@ function includeRelations(query) {
 
   // Por padrão,não inclui nenhum relacionamento
   const include = {}
-
   // Se o parâmetro inclide estiver na query string
   if (query.include) {
     // Recorta o valor do parâmetro, separando os
@@ -25,12 +24,14 @@ function includeRelations(query) {
     else if (relations.includes('itens')) {
       include.itens = true
     }
+
+    // Inclusão do cliente (1° nivel)
+    include.cliente = relations.includes
+      ('clientes')
   }
 
   return include
 }
-
-export { includeRelations }
 
 const controller = {}     // Objeto vazio
 
