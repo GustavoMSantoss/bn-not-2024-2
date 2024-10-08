@@ -1,33 +1,32 @@
 import prisma from '../database/client.js'
-//import { includeRelations } from '../lib/utils.js'
+// import { includeRelations } from '../lib/utils.js'
 
 // Versão da função includeRelations() especializada
 // para o controller de vendas, lidando com include
 // de segundo nivel
 function includeRelations(query) {
-
-  // Por padrão,não inclui nenhum relacionamento
+  // Por padrão, não inclui nenhum relacionamento
   const include = {}
-  // Se o parâmetro inclide estiver na query string
-  if (query.include) {
+
+  // Se o parâmentro include estiver na query string
+  if(query.include) {
     // Recorta o valor do parâmetro, separando os
-    // relacionamentos passados por virgula
+    // relacionamentos passados por vírgula
     const relations = query.include.split(',')
 
-    // Include de 2° nivel
-    if (relations.includes('itens.produtos')) {
+    // Include de 2º nível
+    if(relations.includes('itens.produto')) {
       include.itens = {
         include: { produto: true }
       }
     }
-    // Include comum, de 1° nivel
-    else if (relations.includes('itens')) {
+    // Include comum, de 1º nível
+    else if(relations.includes('itens')) {
       include.itens = true
     }
 
-    // Inclusão do cliente (1° nivel)
-    include.cliente = relations.includes
-      ('clientes')
+    // Inclusão do cliente (1º nível)
+    include.cliente = relations.includes('cliente')
   }
 
   return include
@@ -35,7 +34,7 @@ function includeRelations(query) {
 
 const controller = {}     // Objeto vazio
 
-controller.create = async function (req, res) {
+controller.create = async function(req, res) {
   try {
     /*
       Conecta-se ao BD e envia uma instrução de
@@ -48,7 +47,7 @@ controller.create = async function (req, res) {
     // HTTP 201: Created
     res.status(201).end()
   }
-  catch (error) {
+  catch(error) {
     // Deu errado: exibe o erro no console do back-end
     console.error(error)
 
@@ -58,14 +57,14 @@ controller.create = async function (req, res) {
   }
 }
 
-controller.retrieveAll = async function (req, res) {
+controller.retrieveAll = async function(req, res) {
   try {
 
     const include = includeRelations(req.query)
 
     // Manda buscar os dados no servidor
     const result = await prisma.venda.findMany({
-      orderBy: [{ data_hora: 'asc' }],
+      orderBy: [ { data_hora: 'asc' } ],
       include
     })
 
@@ -73,7 +72,7 @@ controller.retrieveAll = async function (req, res) {
     // HTTP 200: OK (implícito)
     res.send(result)
   }
-  catch (error) {
+  catch(error) {
     // Deu errado: exibe o erro no console do back-end
     console.error(error)
 
@@ -83,10 +82,10 @@ controller.retrieveAll = async function (req, res) {
   }
 }
 
-controller.retrieveOne = async function (req, res) {
+controller.retrieveOne = async function(req, res) {
   try {
-
-    const include = includeRelations(req.query)
+    
+    const include = includeRelations(req.query) 
 
     // Manda buscar o documento no servidor usando
     // como critério de busca um id informado no
@@ -97,11 +96,11 @@ controller.retrieveOne = async function (req, res) {
     })
 
     // Encontrou o documento ~> retorna HTTP 200: OK (implícito)
-    if (result) res.send(result)
+    if(result) res.send(result)
     // Não encontrou o documento ~> retorna HTTP 404: Not Found
     else res.status(404).end()
   }
-  catch (error) {
+  catch(error) {
     // Deu errado: exibe o erro no console do back-end
     console.error(error)
 
@@ -111,7 +110,7 @@ controller.retrieveOne = async function (req, res) {
   }
 }
 
-controller.update = async function (req, res) {
+controller.update = async function(req, res) {
   try {
     // Busca o documento pelo id passado como parâmetro e, caso
     // o documento seja encontrado, atualiza-o com as informações
@@ -122,11 +121,11 @@ controller.update = async function (req, res) {
     })
 
     // Encontrou e atualizou ~> retorna HTTP 204: No Content
-    if (result) res.status(204).end()
+    if(result) res.status(204).end()
     // Não encontrou (e não atualizou) ~> retorna HTTP 404: Not Found
     else res.status(404).end()
   }
-  catch (error) {
+  catch(error) {
     // Deu errado: exibe o erro no console do back-end
     console.error(error)
 
@@ -136,7 +135,7 @@ controller.update = async function (req, res) {
   }
 }
 
-controller.delete = async function (req, res) {
+controller.delete = async function(req, res) {
   try {
     // Busca o documento a ser excluído pelo id passado
     // como parâmetro e efetua a exclusão caso encontrado
@@ -148,8 +147,8 @@ controller.delete = async function (req, res) {
     res.status(204).end()
 
   }
-  catch (error) {
-    if (error?.code === 'P2025') {   // Código erro de exclusão no Prisma
+  catch(error) {
+    if(error?.code === 'P2025') {   // Código erro de exclusão no Prisma
       // Não encontrou e não excluiu ~> HTTP 404: Not Found
       res.status(404).end()
     }
@@ -166,7 +165,7 @@ controller.delete = async function (req, res) {
 
 /***************************************************************/
 
-controller.createItem = async function (req, res) {
+controller.createItem = async function(req, res) {
   try {
     // Adiciona no corpo da requisição o id da venda,
     // passado como parâmetro na rota
@@ -178,7 +177,7 @@ controller.createItem = async function (req, res) {
     // HTTP 201: Created
     res.status(201).end()
   }
-  catch (error) {
+  catch(error) {
     // Deu errado: exibe o erro no console do back-end
     console.error(error)
 
@@ -188,21 +187,21 @@ controller.createItem = async function (req, res) {
   }
 }
 
-controller.retrieveAllItems = async function (req, res) {
+controller.retrieveAllItems = async function(req, res) {
   try {
     const include = includeRelations(req.query)
 
     // Manda buscar os dados no servidor
     const result = await prisma.itemVenda.findMany({
       where: { venda_id: req.params.id },
-      orderBy: [{ num_item: 'asc' }],
+      orderBy: [ { num_item: 'asc' } ],
       include
     })
 
     // HTTP 200: OK
     res.send(result)
   }
-  catch (error) {
+  catch(error) {
     // Deu errado: exibe o erro no console do back-end
     console.error(error)
 
@@ -212,7 +211,7 @@ controller.retrieveAllItems = async function (req, res) {
   }
 }
 
-controller.retrieveOneItem = async function (req, res) {
+controller.retrieveOneItem = async function(req, res) {
   try {
 
     // A rigor, o item da venda poderia ser encontrado apenas por
@@ -227,11 +226,11 @@ controller.retrieveOneItem = async function (req, res) {
     })
 
     // Encontrou o documento ~> retorna HTTP 200: OK (implícito)
-    if (result) res.send(result)
+    if(result) res.send(result)
     // Não encontrou o documento ~> retorna HTTP 404: Not Found
     else res.status(404).end()
   }
-  catch (error) {
+  catch(error) {
     // Deu errado: exibe o erro no console do back-end
     console.error(error)
 
@@ -241,7 +240,7 @@ controller.retrieveOneItem = async function (req, res) {
   }
 }
 
-controller.updateItem = async function (req, res) {
+controller.updateItem = async function(req, res) {
   try {
     const result = await prisma.itemVenda.update({
       where: {
@@ -252,11 +251,11 @@ controller.updateItem = async function (req, res) {
     })
 
     // Encontrou e atualizou ~> HTTP 204: No Content
-    if (result) res.status(204).end()
+    if(result) res.status(204).end()
     // Não encontrou e não atualizou ~> HTTP 404: Not Found
     else res.status(404).end()
   }
-  catch (error) {
+  catch(error) {
     // Deu errado: exibe o erro no console do back-end
     console.error(error)
 
@@ -266,7 +265,7 @@ controller.updateItem = async function (req, res) {
   }
 }
 
-controller.deleteItem = async function (req, res) {
+controller.deleteItem = async function(req, res) {
   try {
     // Busca o documento a ser excluído pelo id passado
     // como parâmetro e efetua a exclusão caso encontrado
@@ -281,8 +280,8 @@ controller.deleteItem = async function (req, res) {
     res.status(204).end()
 
   }
-  catch (error) {
-    if (error?.code === 'P2025') {   // Código erro de exclusão no Prisma
+  catch(error) {
+    if(error?.code === 'P2025') {   // Código erro de exclusão no Prisma
       // Não encontrou e não excluiu ~> HTTP 404: Not Found
       res.status(404).end()
     }
